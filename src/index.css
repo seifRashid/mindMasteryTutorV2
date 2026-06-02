@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@550;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-slate-50 text-slate-800 antialiased selection:bg-indigo-100 selection:text-indigo-900;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Base formatting for WYSIWYG rich text output */
+.prose {
+  font-family: var(--font-sans);
+  line-height: var(--line-height-relaxed, 1.625);
+  color: var(--color-slate-800);
+}
+
+.prose h1 {
+  font-family: var(--font-display);
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-slate-900);
+  letter-spacing: -0.02em;
+}
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-slate-900);
+  letter-spacing: -0.02em;
+}
+
+.prose h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-slate-800);
+}
+
+.prose h4 {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.prose p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--color-pink-500);
+  background-color: var(--color-slate-50);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+  color: var(--color-slate-650);
+}
+
+.prose pre {
+  background-color: var(--color-slate-900);
+  color: var(--color-slate-100);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  background-color: var(--color-slate-100);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-pink-600);
+}
+
+.prose pre code {
+  color: inherit;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  font-size: 0.8125rem;
+}
+
+.prose th {
+  background-color: var(--color-slate-100);
+  font-weight: 700;
+  border: 1px solid var(--color-slate-200);
+  padding: 0.625rem 0.75rem;
+  text-align: left;
+}
+
+.prose td {
+  border: 1px solid var(--color-slate-200);
+  padding: 0.625rem 0.75rem;
+  color: var(--color-slate-600);
+}
+
+.prose tr:nth-child(even) {
+  background-color: var(--color-slate-50/50);
+}
+
+.prose a {
+  color: var(--color-pink-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+
+.prose a:hover {
+  color: var(--color-pink-700);
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-slate-200);
+  margin: 1rem auto;
+  display: block;
+}
+
+/* Theme variations for rich text notes to prevent color clutter in Focus Modes */
+.prose-invert {
+  color: var(--color-slate-200) !important;
+}
+.prose-invert h1, 
+.prose-invert h2, 
+.prose-invert h3, 
+.prose-invert h4,
+.prose-invert h5,
+.prose-invert h6,
+.prose-invert p,
+.prose-invert li,
+.prose-invert strong {
+  color: var(--color-slate-50) !important;
+}
+.prose-invert blockquote {
+  background-color: var(--color-slate-800) !important;
+  color: var(--color-slate-300) !important;
+  border-left-color: var(--color-pink-500) !important;
+}
+.prose-invert code {
+  background-color: var(--color-slate-850, #1e293b) !important;
+  color: var(--color-pink-400) !important;
+}
+.prose-invert th {
+  background-color: var(--color-slate-800) !important;
+  color: var(--color-slate-100) !important;
+  border-color: var(--color-slate-700) !important;
+}
+.prose-invert td {
+  color: var(--color-slate-300) !important;
+  border-color: var(--color-slate-700) !important;
+}
+
+.prose-amber {
+  color: #433422 !important;
+}
+.prose-amber h1, 
+.prose-amber h2, 
+.prose-amber h3, 
+.prose-amber h4,
+.prose-amber h5,
+.prose-amber h6,
+.prose-amber p,
+.prose-amber li,
+.prose-amber strong {
+  color: #5c4033 !important;
+}
+.prose-amber blockquote {
+  background-color: #f3e9d2 !important;
+  color: #5c4033 !important;
+  border-left-color: var(--color-pink-500) !important;
+}
+.prose-amber code {
+  background-color: #ede2d0 !important;
+  color: #9d174d !important;
+}
+.prose-amber th {
+  background-color: #ede2d0 !important;
+  color: #5c4033 !important;
+  border-color: #e1d5c3 !important;
+}
+.prose-amber td {
+  color: #5c4033 !important;
+  border-color: #e1d5c3 !important;
+}
+
+

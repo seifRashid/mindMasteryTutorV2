@@ -1,0 +1,6 @@
+{
+  "name": "Mind Mastery Tutor",
+  "description": "An online learning management system with role-based access for Admins, Teachers, and Students, complete with lessons, video content, notes, and mastery-based quiz progression.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
