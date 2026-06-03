@@ -9,7 +9,7 @@ import { db } from './db.ts';
 import AdminDashboard from './components/AdminDashboard.tsx';
 import TeacherDashboard from './components/TeacherDashboard.tsx';
 import StudentDashboard from './components/StudentDashboard.tsx';
-import { Award, Shield, UserCheck, Flame, BookOpen, User as UserIcon, ArrowRight, Sparkles, GraduationCap, Video, CheckSquare, CheckCircle, ChevronRight, Activity } from 'lucide-react';
+import { Award, Shield, UserCheck, Flame, BookOpen, User as UserIcon, ArrowRight, Sparkles, GraduationCap, Video, CheckSquare, CheckCircle, ChevronRight, Activity, Menu, X } from 'lucide-react';
 
 export default function App() {
   // Initialize Database once on boot
@@ -21,6 +21,7 @@ export default function App() {
   const [users, setUsers] = useState<User[]>(() => db.getUsers());
   const [currentUserId, setCurrentUserId] = useState<string>('user-student-alex'); // start as Alex to show progression rules immediately
   const [showLanding, setShowLanding] = useState<boolean>(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Current active logged in teacher/student/admin object
   const currentUser = users.find((u) => u.id === currentUserId) || users[0];
@@ -79,12 +80,15 @@ export default function App() {
       </div>
 
       {/* Main Educational Navbar */}
-      <header id="app-navigation-header" className="bg-white border-b border-slate-200 px-8 py-4 flex flex-col lg:flex-row items-center justify-between gap-4 sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-xs">
-        <div className="flex items-center gap-3">
+      <header id="app-navigation-header" className="bg-white border-b border-slate-200 px-6 sm:px-8 py-4 sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-xs">
+        <div className="w-full flex items-center justify-between">
           {/* Logo brand click goes to landing home */}
           <button
             id="btn-logo-home"
-            onClick={() => setShowLanding(true)}
+            onClick={() => {
+              setShowLanding(true);
+              setMobileMenuOpen(false);
+            }}
             className="flex items-center gap-3 text-left hover:opacity-90 cursor-pointer focus:outline-none"
           >
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100 shrink-0">
@@ -97,15 +101,28 @@ export default function App() {
               <p className="text-[11px] text-slate-400 font-medium">Structured Academic Mastery System</p>
             </div>
           </button>
+
+          {/* Hamburger Menu Toggle Button on Mobile */}
+          <button
+            id="btn-mobile-menu-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
+          </button>
         </div>
 
-        {/* Global Navigation Hub */}
-        <div className="flex flex-wrap items-center gap-4">
-          <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+        {/* Global Navigation Hub (collapsible on mobile, visible on lg screens) */}
+        <div className={`mt-4 lg:mt-0 flex-col lg:flex-row lg:flex items-stretch lg:items-center gap-4 w-full lg:w-auto ${mobileMenuOpen ? 'flex animate-slide-down' : 'hidden lg:flex'}`}>
+          <nav className="flex flex-col lg:flex-row items-stretch lg:items-center gap-1 bg-slate-100 p-1 rounded-xl w-full lg:w-auto">
             <button
               id="btn-nav-home"
-              onClick={() => setShowLanding(true)}
-              className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer ${
+              onClick={() => {
+                setShowLanding(true);
+                setMobileMenuOpen(false);
+              }}
+              className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer text-center ${
                 showLanding
                   ? 'bg-white text-indigo-805 shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-900'
@@ -115,8 +132,11 @@ export default function App() {
             </button>
             <button
               id="btn-nav-class"
-              onClick={() => setShowLanding(false)}
-              className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer ${
+              onClick={() => {
+                setShowLanding(false);
+                setMobileMenuOpen(false);
+              }}
+              className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer text-center ${
                 !showLanding
                   ? 'bg-white text-indigo-805 shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-900'
@@ -126,17 +146,17 @@ export default function App() {
             </button>
           </nav>
 
-          <span className="w-[1px] h-6 bg-slate-200 hidden lg:inline"></span>
+          <span className="w-full h-[1px] lg:w-[1px] lg:h-6 bg-slate-200 block lg:inline"></span>
 
           {/* Current logged-in user profile view */}
-          <div className="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs">
+          <div className="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs w-full lg:w-auto">
             <img
               src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'}
               alt={currentUser.name}
               className="w-9 h-9 rounded-full border-2 border-indigo-100 object-cover bg-slate-50 shrink-0"
             />
-            <div className="text-left">
-              <div className="flex items-center gap-1.5">
+            <div className="text-left flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="font-bold text-xs text-slate-950">{currentUser.name}</span>
                 <span className={`text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded ${
                   currentUser.role === UserRole.ADMIN 

@@ -60,6 +60,13 @@ export interface Question {
   explanation?: string;
 }
 
+export interface NotePdf {
+  id: string;
+  name: string;
+  url: string; // Base64 or a local/web path
+  description: string;
+}
+
 export interface Lesson {
   id: string;
   topicId: string;
@@ -69,7 +76,9 @@ export interface Lesson {
   videoUrl: string; // can be YouTube ID or a clean sample video URL
   duration: string; // e.g. "12:15"
   notes: string; // rich markdown-compatible content
+  pdfs?: NotePdf[];
   questions: Question[];
+  allowMultipleAttempts?: boolean;
 }
 
 export interface QuizAttempt {

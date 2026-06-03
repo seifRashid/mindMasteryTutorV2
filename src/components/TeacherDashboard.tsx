@@ -4,12 +4,13 @@
  */
 
 import { useState, FormEvent } from 'react';
-import { User, Class, Subject, Topic, Lesson, UserRole, Question, QuestionType } from '../types.ts';
+import { User, Class, Subject, Topic, Lesson, UserRole, Question, QuestionType, NotePdf } from '../types.ts';
 import { db } from '../db.ts';
 import { 
   Plus, Edit2, Trash2, Video, BookOpen, Layers, 
   HelpCircle, Eye, Check, RefreshCw, Award, 
-  ChevronRight, Save, Clock, ArrowLeft, BarChart2, GraduationCap
+  ChevronRight, Save, Clock, ArrowLeft, BarChart2, GraduationCap,
+  FileText, Paperclip, X, Upload, Info, File
 } from 'lucide-react';
 import { RichTextEditor } from './RichTextEditor.tsx';
 
@@ -77,7 +78,32 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
   const [videoUrl, setVideoUrl] = useState('');
   const [lessonDuration, setLessonDuration] = useState('');
   const [lessonNotes, setLessonNotes] = useState('');
+  const [lessonPdfs, setLessonPdfs] = useState<NotePdf[]>([]);
   const [lessonQuestions, setLessonQuestions] = useState<Question[]>([]);
+  const [allowMultipleAttempts, setAllowMultipleAttempts] = useState(true);
+
+  // States to add a single PDF
+  const [newPdfName, setNewPdfName] = useState('');
+  const [newPdfDescription, setNewPdfDescription] = useState('');
+  const [newPdfUrl, setNewPdfUrl] = useState('');
+  const [pdfManualUrlActive, setPdfManualUrlActive] = useState(false);
+  const [isDraggingPdf, setIsDraggingPdf] = useState(false);
+
+  const handlePdfFileChange = (file: File) => {
+    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+      alert('Only PDF documents (.pdf) are accepted.');
+      return;
+    }
+    const cleanName = file.name.replace(/\.[^/.]+$/, "");
+    setNewPdfName(cleanName);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        setNewPdfUrl(e.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Question editing modal helper
   const [questionEditorOpen, setQuestionEditorOpen] = useState(false);
@@ -111,6 +137,12 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
 
   // Open Lesson Form
   const handleOpenLessonCreator = (lessonId?: string) => {
+    setNewPdfName('');
+    setNewPdfDescription('');
+    setNewPdfUrl('');
+    setPdfManualUrlActive(false);
+    setIsDraggingPdf(false);
+
     if (lessonId) {
       // Edit mode
       const target = lessons.find(l => l.id === lessonId);
@@ -122,7 +154,9 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
         setVideoUrl(target.videoUrl);
         setLessonDuration(target.duration);
         setLessonNotes(target.notes);
+        setLessonPdfs(target.pdfs || []);
         setLessonQuestions(target.questions || []);
+        setAllowMultipleAttempts(target.allowMultipleAttempts !== false);
       }
     } else {
       // Create mode
@@ -133,12 +167,14 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
       setVideoUrl('https://www.youtube.com/embed/grnP3mDuESc');
       setLessonDuration('05:00');
       setLessonNotes('Type rich theoretical notes, lists, equations, or guidelines here to educate your students.');
+      setLessonPdfs([]);
       setLessonQuestions([]);
+      setAllowMultipleAttempts(true);
     }
     setLessonEditorOpen(true);
   };
 
-  // Save complete lesson (including its quiz questions)
+  // Save complete lesson (including its quiz questions and PDF files)
   const handleSaveLesson = () => {
     if (!lessonName || !activeTopicId) return;
 
@@ -155,7 +191,9 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
             videoUrl,
             duration: lessonDuration,
             notes: lessonNotes,
-            questions: lessonQuestions
+            pdfs: lessonPdfs,
+            questions: lessonQuestions,
+            allowMultipleAttempts: allowMultipleAttempts
           };
         }
         return l;
@@ -170,7 +208,9 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
         videoUrl,
         duration: lessonDuration,
         notes: lessonNotes,
-        questions: lessonQuestions
+        pdfs: lessonPdfs,
+        questions: lessonQuestions,
+        allowMultipleAttempts: allowMultipleAttempts
       };
       updatedLessons.push(newLesson);
     }
@@ -745,6 +785,225 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
                       onChange={(content) => setLessonNotes(content)}
                       placeholder="Draft professional theoretical notes. Format your text with headings, tables, links, bold style, lists, highlighters or mathematical layouts..."
                     />
+                  </div>
+
+                  {/* PDF SUPPLEMENTARY STUDY FILES */}
+                  <div className="space-y-4 border-t border-gray-100 pt-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-widest font-mono block">PDF Lecture Notes Attachments</label>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Attach one or multiple reference PDF booklets, academic guides, or formula handouts.</p>
+                    </div>
+
+                    {/* PDF drop upload area container */}
+                    <div 
+                      onDragOver={(e) => { e.preventDefault(); setIsDraggingPdf(true); }}
+                      onDragLeave={() => setIsDraggingPdf(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDraggingPdf(false);
+                        const file = e.dataTransfer.files?.[0];
+                        if (file) handlePdfFileChange(file);
+                      }}
+                      onClick={() => document.getElementById('lesson-pdf-file-selector')?.click()}
+                      className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition select-none flex flex-col items-center justify-center gap-1.5 ${
+                        isDraggingPdf 
+                          ? 'border-pink-500 bg-pink-50/50 text-pink-700 font-bold' 
+                          : 'border-slate-200 hover:border-slate-300 bg-slate-50 text-slate-600'
+                      }`}
+                    >
+                      <input 
+                        id="lesson-pdf-file-selector"
+                        type="file" 
+                        accept=".pdf"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handlePdfFileChange(file);
+                        }}
+                      />
+                      <Upload className={`w-6 h-6 ${isDraggingPdf ? 'animate-bounce text-pink-600' : 'text-slate-400'}`} />
+                      <div className="space-y-0.5">
+                        <p className="text-xs font-semibold">
+                          {newPdfUrl ? '✓ PDF Loaded Successfully' : 'Drag & Drop PDF document here'}
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          {newPdfUrl ? 'Format valid. Configure details below to attach' : 'or click to browse local files (.pdf)'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Choose Preset Button or Switch representation */}
+                    <div className="flex items-center justify-between gap-2 bg-slate-100/50 p-2 rounded-xl text-[10px] font-medium text-slate-500">
+                      <span>Or load an academic sample layout:</span>
+                      <div className="flex gap-1">
+                        <button
+                          id="btn-load-sample-pdf-1"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNewPdfName('Atomic Orbitals Theory Notes');
+                            setNewPdfDescription('Core syllabus coverage of atomic equations, angular momentum vectors, and reference orbitals.');
+                            setNewPdfUrl('https://arxiv.org/pdf/quant-ph/0410100.pdf');
+                          }}
+                          className="bg-white border hover:bg-slate-50 hover:text-slate-900 border-slate-200 px-1.5 py-0.5 rounded transition cursor-pointer"
+                        >
+                          Quantum Notes
+                        </button>
+                        <button
+                          id="btn-load-sample-pdf-2"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNewPdfName('Periodic Properties reference Sheet');
+                            setNewPdfDescription('Official reference formulas sheet and periodic properties quantum status definitions table.');
+                            setNewPdfUrl('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf');
+                          }}
+                          className="bg-white border hover:bg-slate-50 hover:text-slate-900 border-slate-200 px-1.5 py-0.5 rounded transition cursor-pointer"
+                        >
+                          Periodic Sheet
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* PDF Title & Brief Description details card */}
+                    <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2 text-xs">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                        <span className="font-bold text-slate-705 font-mono text-[10px] tracking-wider uppercase">Configure Selected PDF</span>
+                        <button
+                          id="btn-toggle-pdf-entry"
+                          type="button"
+                          onClick={() => setPdfManualUrlActive(!pdfManualUrlActive)}
+                          className="text-[10px] text-pink-600 hover:underline font-semibold"
+                        >
+                          {pdfManualUrlActive ? 'Switch to Upload mode' : 'Enter Web URL directly'}
+                        </button>
+                      </div>
+
+                      {pdfManualUrlActive && (
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-slate-500 uppercase font-mono">Web PDF URL Address</label>
+                          <input
+                            id="input-pdf-manual-url"
+                            type="text"
+                            placeholder="e.g. https://domain.edu/notes.pdf"
+                            value={newPdfUrl}
+                            onChange={(e) => setNewPdfUrl(e.target.value)}
+                            className="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:outline-none font-mono"
+                          />
+                        </div>
+                      )}
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase font-mono">Document Name/Title</label>
+                        <input
+                          id="input-pdf-manual-title"
+                          type="text"
+                          placeholder="e.g., Orbital Handout Booklet"
+                          value={newPdfName}
+                          onChange={(e) => setNewPdfName(e.target.value)}
+                          className="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase font-mono">Brief Description</label>
+                        <textarea
+                          id="textarea-pdf-manual-desc"
+                          rows={2}
+                          placeholder="What is this PDF document about? Briefly outline what theoretical details are covered..."
+                          value={newPdfDescription}
+                          onChange={(e) => setNewPdfDescription(e.target.value)}
+                          className="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:outline-none"
+                        />
+                      </div>
+
+                      <button
+                        id="btn-attach-lesson-pdf"
+                        type="button"
+                        onClick={() => {
+                          if (!newPdfName.trim()) {
+                            alert('Please define a title/name for the PDF notes.');
+                            return;
+                          }
+                          if (!newPdfUrl) {
+                            alert('Please upload a PDF file or provide a PDF URL address first.');
+                            return;
+                          }
+                          const newPdf: NotePdf = {
+                            id: `pdf-${Date.now()}`,
+                            name: newPdfName,
+                            url: newPdfUrl,
+                            description: newPdfDescription
+                          };
+                          setLessonPdfs([...lessonPdfs, newPdf]);
+                          setNewPdfName('');
+                          setNewPdfDescription('');
+                          setNewPdfUrl('');
+                        }}
+                        className="w-full bg-pink-650 hover:bg-pink-700 text-white font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer"
+                      >
+                        ✓ Attach PDF to Lesson
+                      </button>
+                    </div>
+
+                    {/* Attached PDFs list */}
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold font-mono text-slate-500 uppercase tracking-widest block">
+                        Attached Documents ({lessonPdfs.length})
+                      </span>
+                      {lessonPdfs.length === 0 ? (
+                        <p className="text-[10px] italic text-slate-400 bg-slate-50 p-2 text-center rounded border border-dashed border-slate-150">
+                          No supplemental PDF handbooks attached to this lesson. Everything is delivered via the theoretical notes form.
+                        </p>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {lessonPdfs.map((pdf, idx) => (
+                            <div key={pdf.id} className="flex items-start justify-between gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs hover:bg-slate-100/50 transition">
+                              <div className="flex gap-1.5 min-w-0">
+                                <FileText className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
+                                <div className="min-w-0">
+                                  <p className="font-bold text-slate-800 truncate leading-tight capitalize">{pdf.name}</p>
+                                  {pdf.description ? (
+                                    <p className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">{pdf.description}</p>
+                                  ) : (
+                                    <p className="text-[10px] italic text-slate-400 mt-0.5">No supplementary description available.</p>
+                                  )}
+                                  <span className="text-[9px] font-mono text-slate-400 bg-white border border-slate-150 px-1 rounded block w-max mt-1">
+                                    Source: {pdf.url.startsWith('data:') ? 'Local Uploaded Attachment' : 'External Web URL'}
+                                  </span>
+                                </div>
+                              </div>
+                              <button
+                                id={`btn-delete-attached-pdf-${idx}`}
+                                type="button"
+                                onClick={() => {
+                                  setLessonPdfs(lessonPdfs.filter((_, i) => i !== idx));
+                                }}
+                                className="p-1 hover:bg-rose-50 text-rose-600 rounded transition shrink-0"
+                                title="Remove PDF attachment"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 border-t border-gray-100 pt-3">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest font-mono block">Assessment Settings</label>
+                    <label className="flex items-center gap-2 text-xs font-bold font-sans text-gray-700 cursor-pointer bg-gray-50 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 select-none transition">
+                      <input
+                        id="checkbox-lesson-form-multiple-attempts"
+                        type="checkbox"
+                        checked={allowMultipleAttempts}
+                        onChange={(e) => setAllowMultipleAttempts(e.target.checked)}
+                        className="accent-pink-600 w-4 h-4 cursor-pointer"
+                      />
+                      <span>Allow Multiple Quiz Attempts</span>
+                    </label>
+                    <p className="text-[10px] text-gray-500">If checked, students can retake the quiz multiple times. If unchecked, students can only submit once and are locked down to their final score.</p>
                   </div>
                 </div>
 
