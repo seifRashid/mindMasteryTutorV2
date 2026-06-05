@@ -361,7 +361,7 @@ export default function StudentDashboard({ currentUser }: StudentDashboardProps)
         {/* SIDEBAR: Topics and Lessons lists */}
         <div 
           id="student-syllabus-tracker" 
-          className={`bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6 ${
+          className={`bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6 text-heavy-section ${
             mobileActiveView === 'lesson' ? 'hidden lg:block' : 'block'
           }`}
         >
@@ -919,7 +919,7 @@ export default function StudentDashboard({ currentUser }: StudentDashboardProps)
 
                   {/* ACTIVE QUIZ FORM */}
                   {quizActive && activeLesson.questions && activeLesson.questions.length > 0 && (
-                    <div id="quiz-scaffold" className="space-y-4">
+                    <div id="quiz-scaffold" className="space-y-4 quiz-section text-heavy-section">
                       {showSubmitConfirmation ? (
                         /* SECURE ACCIDENT-PREVENTION SUBMIT CONFIRMATION SCREEN */
                         <div className="p-6 border-2 border-indigo-205 bg-indigo-50/10 rounded-2xl space-y-4 animate-scale-in text-left">

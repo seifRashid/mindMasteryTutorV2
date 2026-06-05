@@ -9,6 +9,7 @@ import { db } from './db.ts';
 import AdminDashboard from './components/AdminDashboard.tsx';
 import TeacherDashboard from './components/TeacherDashboard.tsx';
 import StudentDashboard from './components/StudentDashboard.tsx';
+import AccessibilityWidget from './components/AccessibilityWidget.tsx';
 import { Award, Shield, UserCheck, Flame, BookOpen, User as UserIcon, ArrowRight, Sparkles, GraduationCap, Video, CheckSquare, CheckCircle, ChevronRight, Activity, Menu, X } from 'lucide-react';
 
 export default function App() {
@@ -363,6 +364,9 @@ export default function App() {
           </p>
         </div>
       </footer>
+
+      {/* Global Accessibility Font and Visual Aids Controller */}
+      <AccessibilityWidget />
 
     </div>
   );

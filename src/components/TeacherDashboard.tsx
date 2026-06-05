@@ -832,39 +832,6 @@ export default function TeacherDashboard({ currentUser }: TeacherDashboardProps)
                       </div>
                     </div>
 
-                    {/* Choose Preset Button or Switch representation */}
-                    <div className="flex items-center justify-between gap-2 bg-slate-100/50 p-2 rounded-xl text-[10px] font-medium text-slate-500">
-                      <span>Or load an academic sample layout:</span>
-                      <div className="flex gap-1">
-                        <button
-                          id="btn-load-sample-pdf-1"
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setNewPdfName('Atomic Orbitals Theory Notes');
-                            setNewPdfDescription('Core syllabus coverage of atomic equations, angular momentum vectors, and reference orbitals.');
-                            setNewPdfUrl('https://arxiv.org/pdf/quant-ph/0410100.pdf');
-                          }}
-                          className="bg-white border hover:bg-slate-50 hover:text-slate-900 border-slate-200 px-1.5 py-0.5 rounded transition cursor-pointer"
-                        >
-                          Quantum Notes
-                        </button>
-                        <button
-                          id="btn-load-sample-pdf-2"
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setNewPdfName('Periodic Properties reference Sheet');
-                            setNewPdfDescription('Official reference formulas sheet and periodic properties quantum status definitions table.');
-                            setNewPdfUrl('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf');
-                          }}
-                          className="bg-white border hover:bg-slate-50 hover:text-slate-900 border-slate-200 px-1.5 py-0.5 rounded transition cursor-pointer"
-                        >
-                          Periodic Sheet
-                        </button>
-                      </div>
-                    </div>
-
                     {/* PDF Title & Brief Description details card */}
                     <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2 text-xs">
                       <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">

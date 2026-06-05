@@ -252,4 +252,79 @@
   border-color: #e1d5c3 !important;
 }
 
+/* ==========================================================
+   5. EXTENSIBLE GLOBAL ACCESSIBILITY STYLES (REAL-TIME ZOOM)
+   ========================================================== */
+
+:root {
+  --learning-text-multiplier: 1.0;
+}
+
+/* Base structural adjustments for containers containing text-heavy student materials */
+.prose, 
+.learning-content, 
+.quiz-section, 
+.text-heavy-section,
+.discussion-card,
+.announcement-card,
+.markdown-body {
+  font-size: calc(1rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+
+/* Elements inside target containers scale proportionally */
+.prose h1, .learning-content h1, .text-heavy-section h1 {
+  font-size: calc(1.875rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose h2, .learning-content h2, .text-heavy-section h2 {
+  font-size: calc(1.5rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose h3, .learning-content h3, .text-heavy-section h3 {
+  font-size: calc(1.25rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose h4, .learning-content h4, .text-heavy-section h4 {
+  font-size: calc(1.125rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose h5, .learning-content h5, .text-heavy-section h5 {
+  font-size: calc(1rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose p, .learning-content p, .quiz-section p, .text-heavy-section p {
+  font-size: calc(0.875rem * var(--learning-text-multiplier, 1.0)) !important;
+  line-height: calc(1.6 * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose li, .learning-content li, .quiz-section li, .text-heavy-section li {
+  font-size: calc(0.875rem * var(--learning-text-multiplier, 1.0)) !important;
+  line-height: calc(1.6 * var(--learning-text-multiplier, 1.0)) !important;
+}
+.quiz-section label, .quiz-section button:not(.btn-icon) {
+  font-size: calc(0.875rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+
+/* Maintain proportional typographic scaling for nested elements using Tailwind font-size utilities */
+.prose .text-xs, .learning-content .text-xs, .quiz-section .text-xs, .text-heavy-section .text-xs {
+  font-size: calc(0.75rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose .text-sm, .learning-content .text-sm, .quiz-section .text-sm, .text-heavy-section .text-sm {
+  font-size: calc(0.875rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose .text-base, .learning-content .text-base, .quiz-section .text-base, .text-heavy-section .text-base {
+  font-size: calc(1rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose .text-lg, .learning-content .text-lg, .quiz-section .text-lg, .text-heavy-section .text-lg {
+  font-size: calc(1.125rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose .text-xl, .learning-content .text-xl, .quiz-section .text-xl, .text-heavy-section .text-xl {
+  font-size: calc(1.25rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+.prose .text-2xl, .learning-content .text-2xl, .quiz-section .text-2xl, .text-heavy-section .text-2xl {
+  font-size: calc(1.5rem * var(--learning-text-multiplier, 1.0)) !important;
+}
+
+/* Smooth drag and pointer states */
+.drag-handle-cursor {
+  cursor: grab;
+}
+.drag-handle-cursor:active {
+  cursor: grabbing;
+}
+
 
