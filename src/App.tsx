@@ -10,6 +10,8 @@ import AdminDashboard from './components/AdminDashboard.tsx';
 import TeacherDashboard from './components/TeacherDashboard.tsx';
 import StudentDashboard from './components/StudentDashboard.tsx';
 import AccessibilityWidget from './components/AccessibilityWidget.tsx';
+import SignInView from './components/SignInView.tsx';
+import SignUpView from './components/SignUpView.tsx';
 import { Award, Shield, UserCheck, Flame, BookOpen, User as UserIcon, ArrowRight, Sparkles, GraduationCap, Video, CheckSquare, CheckCircle, ChevronRight, Activity, Menu, X } from 'lucide-react';
 
 export default function App() {
@@ -22,6 +24,7 @@ export default function App() {
   const [users, setUsers] = useState<User[]>(() => db.getUsers());
   const [currentUserId, setCurrentUserId] = useState<string>('user-student-alex'); // start as Alex to show progression rules immediately
   const [showLanding, setShowLanding] = useState<boolean>(true);
+  const [currentView, setCurrentView] = useState<'app' | 'signin' | 'signup'>('app');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Current active logged in teacher/student/admin object
@@ -33,6 +36,7 @@ export default function App() {
     setUsers(db.getUsers());
     setCurrentUserId(userId);
     setShowLanding(false); // Auto-direct to core dashboards if swapped from simulator bar
+    setCurrentView('app'); // Reset to core app view
   };
 
   // Direct fast role-entry triggers from CTAs
@@ -42,6 +46,7 @@ export default function App() {
       setCurrentUserId(matchedUser.id);
     }
     setShowLanding(false);
+    setCurrentView('app');
   };
 
   // Live dynamic system counters
@@ -88,6 +93,7 @@ export default function App() {
             id="btn-logo-home"
             onClick={() => {
               setShowLanding(true);
+              setCurrentView('app');
               setMobileMenuOpen(false);
             }}
             className="flex items-center gap-3 text-left hover:opacity-90 cursor-pointer focus:outline-none"
@@ -121,12 +127,13 @@ export default function App() {
               id="btn-nav-home"
               onClick={() => {
                 setShowLanding(true);
+                setCurrentView('app');
                 setMobileMenuOpen(false);
               }}
               className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer text-center ${
-                showLanding
-                  ? 'bg-white text-indigo-805 shadow-xs font-bold'
-                  : 'text-slate-500 hover:text-slate-900'
+                showLanding && currentView === 'app'
+                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
               }`}
             >
               Overview Home
@@ -135,15 +142,44 @@ export default function App() {
               id="btn-nav-class"
               onClick={() => {
                 setShowLanding(false);
+                setCurrentView('app');
                 setMobileMenuOpen(false);
               }}
               className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer text-center ${
-                !showLanding
-                  ? 'bg-white text-indigo-805 shadow-xs font-bold'
-                  : 'text-slate-500 hover:text-slate-900'
+                !showLanding && currentView === 'app'
+                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
               }`}
             >
               Active Dashboard
+            </button>
+            <button
+              id="btn-nav-signin"
+              onClick={() => {
+                setCurrentView('signin');
+                setMobileMenuOpen(false);
+              }}
+              className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer text-center ${
+                currentView === 'signin'
+                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              id="btn-nav-signup"
+              onClick={() => {
+                setCurrentView('signup');
+                setMobileMenuOpen(false);
+              }}
+              className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all cursor-pointer text-center ${
+                currentView === 'signup'
+                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              Register
             </button>
           </nav>
 
@@ -178,7 +214,34 @@ export default function App() {
       {/* Main Container */}
       <main id="app-workspace-canvas" className="flex-1 w-full max-w-7xl mx-auto p-6 sm:p-8">
         
-        {showLanding ? (
+        {currentView === 'signin' ? (
+          <SignInView
+            onLoginSuccess={(matchedUser) => {
+              setCurrentUserId(matchedUser.id);
+              setCurrentView('app');
+              setShowLanding(false);
+            }}
+            onNavigateToSignUp={() => setCurrentView('signup')}
+            onCancel={() => {
+              setCurrentView('app');
+              setShowLanding(true);
+            }}
+          />
+        ) : currentView === 'signup' ? (
+          <SignUpView
+            onRegisterSuccess={(newUser) => {
+              setUsers(db.getUsers());
+              setCurrentUserId(newUser.id);
+              setCurrentView('app');
+              setShowLanding(false);
+            }}
+            onNavigateToSignIn={() => setCurrentView('signin')}
+            onCancel={() => {
+              setCurrentView('app');
+              setShowLanding(true);
+            }}
+          />
+        ) : showLanding ? (
           /* Sleek Landing Page layout */
           <div className="space-y-16 animate-fade-in text-slate-800 py-4 max-w-5xl mx-auto">
             
@@ -366,7 +429,7 @@ export default function App() {
       </footer>
 
       {/* Global Accessibility Font and Visual Aids Controller */}
-      <AccessibilityWidget />
+      {currentView === 'app' && !showLanding && <AccessibilityWidget />}
 
     </div>
   );
